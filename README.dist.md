@@ -1,10 +1,10 @@
 greathouse-openresty
 ====
 # How to Install
-These instructions assume that you've already created a useable database for your Wordpess installation, along with having the required credentials. If you need help on creating a database, you can [learn how, here](https://codex.wordpress.org/Installing_WordPress#Step_2:_Create_the_Database_and_a_User).
+These instructions assume that you've already created a useable database for your application, along with having the required credentials. If you do not need a database, you can ignore the database credentials or set them as placeholders for later. If you need help on creating a database, you can [learn how, here](https://www.postgresql.org/docs/10/tutorial-install.html).
 
 * Download the git repository
-    * `git clone https://greathouse.technology/web/greathouse-openresty.git`
+    * `git clone https://github.com/jesse-greathouse/greathouse-openresty`
 * Change to the greathouse-openresty directory
     * `cd greathouse-openresty`
 
@@ -54,14 +54,7 @@ These instructions assume that you've already created a useable database for you
         -e DB_PORT=3306 \
         -v $(pwd)/error.log:/app/error.log \
         -v $(pwd)/supervisord.log:/app/supervisord.log \
-        -v $(pwd)/web/wp-authentication-keys.php:/app/web/wp-authentication-keys.php \
-        -v $(pwd)/web/wp-config.php:/app/web/wp-config.php \
         -v $(pwd)/etc/nginx/nginx.conf:/app/etc/nginx/nginx.conf \
-        -v $(pwd)/etc/php/php.ini:/app/etc/php/php.ini \
-        -v $(pwd)/etc/php/php-fpm.conf:/app/etc/php/php-fpm.conf \
-        -v $(pwd)/web/wp-content/plugins:/app/web/wp-content/plugins \
-        -v $(pwd)/web/wp-content/themes:/app/web/wp-content/themes \
-        -v $(pwd)/web/wp-content/uploads:/app/web/wp-content/uploads \
         --restart no \
         --name my-site \
         jessegreathouse/greathouse-openresty
