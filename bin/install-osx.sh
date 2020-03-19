@@ -57,7 +57,7 @@ brew install intltool icu4c autoconf automake python@3.8 \
 
 pip install supervisor
 
-openresty
+# Compile and Install Openresty
 tar -xf ${OPT}/openresty-*.tar.gz -C ${OPT}/
 
 cd ${OPT}/openresty-*/
