@@ -60,7 +60,11 @@ pip install supervisor
 # Compile and Install Openresty
 tar -xf ${OPT}/openresty-*.tar.gz -C ${OPT}/
 
+# Fix the escape frontslash feature of lua-cjson
+sed -i '' s/"    NULL, NULL, NULL, NULL, NULL, NULL, NULL, \"\\\\\\\\\/\","/"    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,"/g ${OPT}/openresty-*/bundle/lua-cjson-2.1.0.7/lua_cjson.c
+
 cd ${OPT}/openresty-*/
+
 ./configure --with-cc-opt="-I/usr/local/include -I/usr/local/opt/openssl/include" \
             --with-ld-opt="-L/usr/local/lib -L/usr/local/opt/openssl/lib" \
             --prefix=${OPT}/openresty \
@@ -68,7 +72,6 @@ cd ${OPT}/openresty-*/
             --with-ipv6 \
             --with-http_iconv_module \
             -j2 && \
-make
 make install
 
 cd ${DIR}

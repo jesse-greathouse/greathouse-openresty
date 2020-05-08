@@ -45,10 +45,6 @@ VAR="$( cd -P "$DIR/var" && pwd )"
 WEB="$( cd -P "$DIR/web" && pwd )"
 PATH=~/Library/Python/2.7/bin:${PATH}
 
-if [ -z "$DEBUG" ]; then
-    DEBUG=true
-fi
-
 if [ -z "$ENV" ]; then
     ENV=local
 fi
@@ -63,12 +59,14 @@ ENV=${ENV} DEBUG=${DEBUG} \
 CACHE_DIR=${VAR}\cache \
 LOG_DIR=${VAR}\logs \
 FORCE_SSL=__FORCE_SSL__ \
+DEBUG=__DEBUG__ \
 REDIS_HOST=127.0.0.1 \
 DB_NAME=__DB_NAME__ \
 DB_USER=__DB_USER__ \
 DB_PASSWORD=__DB_PASSWORD__ \
 DB_HOST=__DB_HOST__ \
-DB_PORT=3306 \
+DB_PORT=__DB_PORT__ \
+REDIS_HOST=__REDIS_HOST__ \
 supervisord -c ${ETC}/supervisor/conf.d/supervisord.conf
 
 printf "\n"

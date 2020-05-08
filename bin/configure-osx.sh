@@ -76,10 +76,10 @@ printf "=================================================================\n"
 printf "Hello, "${USER}".  This will create your site's run script\n"
 printf "=================================================================\n"
 printf "\n"
-printf "Enter your name of your site [${USER}]: "
+printf "Enter your name of your site [MySite]: "
 read SITE_NAME
 if  [ "${SITE_NAME}" == "" ]; then
-    SITE_NAME=${USER}
+    SITE_NAME="MySite"
 fi
 printf "Enter the domains of your site [127.0.0.1 localhost]: "
 read SITE_DOMAINS
@@ -111,6 +111,16 @@ read DB_PASSWORD
 if  [ "${DB_PASSWORD}" == "" ]; then
     DB_PASSWORD="db_password"
 fi
+printf "Enter your database port [3306]: "
+read DB_PORT
+if  [ "${DB_PORT}" == "" ]; then
+    DB_PORT="3306"
+fi
+printf "Enter your redis host [127.0.0.1]: "
+read REDIS_HOST
+if  [ "${REDIS_HOST}" == "" ]; then
+    REDIS_HOST="127.0.0.1"
+fi
 printf "Force visitors to https? (y or n): "
 read -n 1 FORCE_SSL
 if  [ "${FORCE_SSL}" == "y" ]; then
@@ -118,10 +128,12 @@ if  [ "${FORCE_SSL}" == "y" ]; then
 else
     FORCE_SSL="false"
 fi
-printf "\nServer Timezone [America/Chicago]: "
-read DATE_TIMEZONE
-if  [ "${DATE_TIMEZONE}" == "" ]; then
-    DATE_TIMEZONE="America/Chicago"
+printf "\nDebug (Not recommended for production environments) (y or n): "
+read -n 1 DEBUG
+if  [ "${DEBUG}" == "n" ]; then
+    DEBUG="false"
+else
+    DEBUG="true"
 fi
 
 printf "\n"
@@ -134,8 +146,10 @@ printf "Database Host: ${DB_HOST} \n"
 printf "Database Name: ${DB_NAME} \n"
 printf "Database User: ${DB_USER} \n"
 printf "Database Password: ${DB_PASSWORD} \n"
+printf "Database Port: ${DB_PORT} \n"
+printf "Redis Host: ${REDIS_HOST} \n"
 printf "Force Https: ${FORCE_SSL} \n"
-printf "Server Timezone: ${DATE_TIMEZONE} \n"
+printf "Debug: ${DEBUG} \n"
 printf "\n"
 printf "Is this correct (y or n): "
 read -n 1 CORRECT
@@ -156,7 +170,10 @@ if  [ "${CORRECT}" == "y" ]; then
     sed -i '' s/__DB_NAME__/"${DB_NAME}"/g ${RUN_SCRIPT}
     sed -i '' s/__DB_USER__/"${DB_USER}"/g ${RUN_SCRIPT}
     sed -i '' s/__DB_PASSWORD__/"${DB_PASSWORD}"/g ${RUN_SCRIPT}
+    sed -i '' s/__REDIS_HOST__/"${REDIS_HOST}"/g ${RUN_SCRIPT}
+    sed -i '' s/__DB_PORT__/"${DB_PORT}"/g ${RUN_SCRIPT}
     sed -i '' s/__FORCE_SSL__/"${FORCE_SSL}"/g ${RUN_SCRIPT}
+    sed -i '' s/__DEBUG__/"${DEBUG}"/g ${RUN_SCRIPT}
     chmod +x ${RUN_SCRIPT}
 
     if [ -f ${NGINX_CONF} ]; then
@@ -164,9 +181,12 @@ if  [ "${CORRECT}" == "y" ]; then
     fi
     cp ${ETC}/nginx/nginx.dist.conf ${NGINX_CONF}
 
+    SESSION_SECRET=`openssl rand -hex 32`
+
     sed -i '' "s __LOG__ $LOG g" ${NGINX_CONF}
     sed -i '' s/__SITE_DOMAINS__/"${SITE_DOMAINS}"/g ${NGINX_CONF}
     sed -i '' s/__PORT__/"${PORT}"/g ${NGINX_CONF}
+    sed -i '' s/__SESSION_SECRET__/"${SESSION_SECRET}"/g ${NGINX_CONF}
 
 printf "\n"
 printf "\n"
@@ -187,7 +207,7 @@ fi
 
 printf "Creating startup script...\n"
 
-LAUNCHD_CONF="${ETC}/com.greathouse.technology.${SITE_NAME}.plist"
+LAUNCHD_CONF="${ETC}/com.jesse-greathuse.${SITE_NAME}.plist"
 
 if [ -f ${LAUNCHD_CONF} ]; then
    rm ${LAUNCHD_CONF}
